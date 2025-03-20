@@ -68,7 +68,7 @@ public class ItemsHandler {
                         logger.debug(
                                 "The Bib exists in the remote Storage - Check for Holding and get Mms Id from exist SCF Bib");
                         mmsId = jsonBibObject.getJSONArray("bib").getJSONObject(0).getString("mms_id");
-                        holdingId = SCFUtil.getSCFHoldingByMmsID(mmsId);
+                        holdingId = SCFUtil.getSCFHoldingByMmsID(mmsId, itemData.getLocation());
                     }
                 } else {
                     logger.debug("get matching bib from SCF by NZ");
@@ -97,7 +97,7 @@ public class ItemsHandler {
                         logger.debug(
                                 "The Bib exists in the remote Storage - Check for Holding and get Mms Id from exist SCF Bib");
                         mmsId = jsonBibObject.getJSONArray("bib").getJSONObject(0).getString("mms_id");
-                        holdingId = SCFUtil.getSCFHoldingByMmsID(mmsId);
+                        holdingId = SCFUtil.getSCFHoldingByMmsID(mmsId, itemData.getLocation());
                     }
                 }
                 if (holdingId == null) {
@@ -112,8 +112,8 @@ public class ItemsHandler {
                     } catch (InterruptedException e) {
                     }
                     if(itemPid != null) {
-	                    logger.debug("Loan the new Item who was created");
-	                    SCFUtil.createSCFLoan(itemData, itemPid);
+                        logger.debug("Loan the new Item who was created");
+                        SCFUtil.createSCFLoan(itemData, itemPid);
                     }
                 } else {
                     String message = "Can't create SCF holding. MMS ID : " + mmsId;
@@ -124,17 +124,17 @@ public class ItemsHandler {
         } else {
             logger.debug("The item exists in the remote Storage");
             if (!SCFUtil.isItemInRemoteStorage(itemData)) {
-            	boolean ignoreDeleteFiles = true;
-            	JSONObject props = ConfigurationHandler.getInstance().getConfiguration();
+                boolean ignoreDeleteFiles = true;
+                JSONObject props = ConfigurationHandler.getInstance().getConfiguration();
                 if (props.has("ignore_delete_files") && props.get("ignore_delete_files") != null) {
                     ignoreDeleteFiles = Boolean.valueOf(props.getString("ignore_delete_files"));
                 }
                 if (ignoreDeleteFiles ) {
                     logger.info("Item exists in the SCF, but in the Institution it's no in a remote-storage location  - Ignoring delete from the SCF");
                 }else {
-	                logger.debug(
-	                        "Item exists in the SCF, but in the Institution it's no in a remote-storage location need to delete it from SCF");
-	                SCFUtil.deleteSCFItem(jsonItemObject, itemData);
+                    logger.debug(
+                            "Item exists in the SCF, but in the Institution it's no in a remote-storage location need to delete it from SCF");
+                    SCFUtil.deleteSCFItem(jsonItemObject, itemData);
                 }
             } else {
                 logger.debug("Item exists merge between INST item and SCF item");
