@@ -202,17 +202,17 @@ public class SCFUtil {
     }
 
     private static String getLocationForNewHolding(String holdingLib,String defultholdingLoc, ItemData itemData) {
-        logger.debug("get SCF loctions for library :" + holdingLib );
-        if(locationList.contains(itemData.getLocation())){
-            return itemData.getLocation();
+    	logger.debug("get SCF loctions for library :" + holdingLib );
+    	if(locationList.contains(itemData.getLocation())){
+        	return itemData.getLocation();
         }
-
-        logger.debug("get SCF loctions for library :" + holdingLib +" getting locations from API");
-        JSONObject props = ConfigurationHandler.getInstance().getConfiguration();
+    	
+    	logger.debug("get SCF loctions for library :" + holdingLib +" getting locations from API");
+    	JSONObject props = ConfigurationHandler.getInstance().getConfiguration();
         String remoteStorageApikey = props.get("remote_storage_apikey").toString();
         String baseUrl = props.get("gateway").toString();
         HttpResponse locationsResponse = ConfApi.retrieveLibraryLocations(holdingLib, baseUrl,remoteStorageApikey);
-
+        
         if (locationsResponse.getResponseCode() < HttpsURLConnection.HTTP_OK
                 || locationsResponse.getResponseCode() >= HttpsURLConnection.HTTP_MOVED_PERM) {
             logger.warn("Can't get SCF Library Locations - " + locationsResponse.getBody() + ". Library : "
@@ -223,18 +223,18 @@ public class SCFUtil {
         for (int i = 0; i < librariesJson.getJSONArray("location").length(); i++) {
             JSONObject location = librariesJson.getJSONArray("location").getJSONObject(i);
             try {
-                locationList.add(location.getString("code"));
+            	locationList.add(location.getString("code"));
             } catch (JSONException e) {
             }
         }
         if(locationList.contains(itemData.getLocation())){
-            return itemData.getLocation();
+        	return itemData.getLocation();
         }
         logger.debug("SCF loction for library :" + holdingLib +" and location " + itemData.getLocation() + " does not exist returning defult location");
         return defultholdingLoc;
-    }
+	}
 
-    public static JSONObject getINSItem(ItemData itemData) {
+	public static JSONObject getINSItem(ItemData itemData) {
         logger.debug("get institution : " + itemData.getInstitution() + " Item. Barcode : " + itemData.getBarcode());
         JSONObject props = ConfigurationHandler.getInstance().getConfiguration();
         String baseUrl = props.get("gateway").toString();
@@ -404,14 +404,14 @@ public class SCFUtil {
         String userId = getUserIdByIns(itemData);
         JSONObject jsonRequest = getRequestObj();
         jsonRequest.put("user_primary_id", userId);
-
+        
         String comment ="";
         if(itemData.getRequestNote() != null) {
-            comment =  itemData.getRequestNote() + " ";
+        	comment =  itemData.getRequestNote() + " ";
         }
         if(itemData.getPatron() != null) {
-            comment += itemData.getPatron().toString();
-        }
+        	comment += itemData.getPatron().toString();
+        } 
         jsonRequest.put("comment", comment);
 
         HttpResponse requestResponse = RequestApi.createRequest(mmsId, holdingId, itemPid, baseUrl, remoteStorageApikey,
@@ -430,7 +430,7 @@ public class SCFUtil {
     }
 
     public static HttpResponse createSCFBibRequest(JSONObject jsonBibObject, JSONObject jsonRequestObject,
-                                                   ItemData itemData) {
+            ItemData itemData) {
         String mmsId = null;
         try {
             mmsId = jsonBibObject.getJSONArray("bib").getJSONObject(0).getString("mms_id");
@@ -453,7 +453,7 @@ public class SCFUtil {
         }
         comment += "The inventory for this request should come from " + itemData.getSourceInstitution()+". ";
         if(itemData.getPatron() != null) {
-            comment += itemData.getPatron().toString();
+        	comment += itemData.getPatron().toString();
         }
         if (jsonRequestObject != null) {
             if (itemData.getDescription() == null && jsonRequestObject.has("description")) {
@@ -622,7 +622,7 @@ public class SCFUtil {
     }
 
     public static HttpResponse cancelItemRequest(JSONObject jsonItemObject, ItemData itemData, String requestId,
-                                                 String cancellationNote) {
+            String cancellationNote) {
         logger.debug("cancel item requests from SCF Item. Barcode : " + itemData.getBarcode());
 
         JSONObject props = ConfigurationHandler.getInstance().getConfiguration();
@@ -710,7 +710,7 @@ public class SCFUtil {
     }
 
     public static JSONObject createSCFDigitizationRequest(JSONObject jsonUserObject, JSONObject jsonRequestObject,
-                                                          JSONObject jsonItemObject, ItemData requestData) {
+            JSONObject jsonItemObject, ItemData requestData) {
 
         logger.debug("create SCF Digitization Request. Barcode: "
                 + jsonItemObject.getJSONObject("item_data").getString("barcode"));
@@ -730,7 +730,7 @@ public class SCFUtil {
                     jsonRequestObject.get("copyrights_declaration_signed_by_patron"));
         }
         if (jsonRequestObject.has("description")) {
-            jsonRequest.put("description", jsonRequestObject.get("description"));
+        	jsonRequest.put("description", jsonRequestObject.get("description"));
         }
         String comment = "";
         if (jsonRequestObject.has("comment") && !jsonRequestObject.get("comment").equals(null)) {
@@ -738,7 +738,7 @@ public class SCFUtil {
         }
         comment += "The inventory for this request should come from " + requestData.getSourceInstitution()+". ";
         if(requestData.getPatron() != null) {
-            comment += requestData.getPatron().toString();
+        	comment += requestData.getPatron().toString();
         }
         jsonRequest.put("partial_digitization", jsonRequestObject.get("partial_digitization"));
         if (jsonRequestObject.has("required_pages_range")) {
@@ -867,7 +867,7 @@ public class SCFUtil {
     }
 
     public static JSONObject createSCFDigitizationUserRequest(JSONObject jsonUserObject, JSONObject jsonRequestObject,
-                                                              JSONObject jsonBibObject, ItemData requestData) {
+            JSONObject jsonBibObject, ItemData requestData) {
         logger.debug("create SCF Digitization Request. User Id: " + jsonUserObject.getString("primary_id"));
         JSONObject props = ConfigurationHandler.getInstance().getConfiguration();
         String remoteStorageApikey = props.get("remote_storage_apikey").toString();
@@ -894,7 +894,7 @@ public class SCFUtil {
         }
         comment += "The inventory for this request should come from " + requestData.getSourceInstitution()+". ";
         if(requestData.getPatron() != null) {
-            comment += requestData.getPatron().toString();
+        	comment += requestData.getPatron().toString();
         }
         jsonRequest.put("partial_digitization", jsonRequestObject.get("partial_digitization"));
         if (jsonRequestObject.has("required_pages_range")) {
@@ -1042,7 +1042,7 @@ public class SCFUtil {
     }
 
     private static String getSCFHoldingByBib(String mmsId, String holdingLib, String holdingLoc, String baseUrl,
-                                             String remoteStorageApikey) {
+            String remoteStorageApikey) {
         JSONArray holdings = getSCFHoldingsByBib(mmsId, baseUrl, remoteStorageApikey);
         for (int i = 0; i < holdings.length(); i++) {
             try {
@@ -1056,17 +1056,17 @@ public class SCFUtil {
                 logger.info("Failed getting holding information error: " + e.getMessage());
             }
         }
-
+        
         if(holdings.length() > 0) {
-            //get the first location
-            JSONObject holding = holdings.getJSONObject(0);
-            return holding.getString("holding_id");
+        	//get the first location
+        	JSONObject holding = holdings.getJSONObject(0);
+        	return holding.getString("holding_id");
         }
         return null;
     }
 
     private static JSONArray getSCFHoldingsByBib(String mmsId, String baseUrl,
-                                                 String remoteStorageApikey) {
+            String remoteStorageApikey) {
         logger.debug("get SCF Holdings. MMS Id : " + mmsId);
         HttpResponse holdingsResponse = HoldingApi.getHoldings(mmsId, baseUrl, remoteStorageApikey);
         if (holdingsResponse.getResponseCode() != HttpsURLConnection.HTTP_OK) {
